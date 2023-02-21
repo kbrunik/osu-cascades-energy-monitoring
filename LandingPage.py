@@ -9,13 +9,11 @@ dataframe['Time'] = dataframe['Date_time']
 print(dataframe.info())
 print(dataframe.head())
 # Title webpage
-st.markdown("<h1 style='text-align: center; color: orange;'>OSU-Cascades Energy Challenge</h1>",
-                 unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: orange;'>OSU-Cascades Energy Challenge</h1>",unsafe_allow_html=True)
 # st.title('ENERGY!!! :zap:')
 
-st.markdown("<h2 style='text-align: center;'>Current Electrical Usage</h2>",
-                 unsafe_allow_html=True)
-st.write('Current Power Usage')
+st.markdown("<h2 style='text-align: center;'>Current Electrical Usage</h2>", unsafe_allow_html=True)
+#st.write('Current Power Usage')
 
 # Columns with current energy trends
 col1, col2, col3, col4, col5 = st.columns(5)    #Establishes number of columns
@@ -101,7 +99,7 @@ with tab7:
     col3.metric('3rd Floor Daily Average','{} kWh'.format(flr_3_kWh_Avg))
     col4.metric('4th Floor Daily Average','{} kWh'.format(flr_4_kWh_Avg))
     with st.expander('See more stats'):
-        st.subheader('Average Daily kWh consumption Per Room')
+        st.subheader('Average Daily kWh Consumption Per Room')
         col1, col2, col3, col4 = st.columns(4)
         col1.metric('1st Floor','{} kWh'.format(flr_1_kWh_Rm))
         col2.metric('2nd Floor','{} kWh'.format(flr_2_kWh_Rm))
