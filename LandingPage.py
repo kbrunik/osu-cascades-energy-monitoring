@@ -1,11 +1,43 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+from Raw_Data import *
+from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
+
+st.set_page_config(
+    layout="wide",
+)
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
+
+#refreshes page every 5 minutes
+st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
+
+SERVER_IDS = [1, 2, 3]
+print("starting data collection...")
+# pullData("IP Address","Username","Password","ID")
+pullData("IP Address","Username","Password","1")
+daily_data_trim(1)
+pullData("IP Address","Username","Password","2")
+daily_data_trim(2)
+pullData("IP Address","Username","Password","3")
+daily_data_trim(3)
+merged_dadta = pull_5_min_data(SERVER_IDS)
+merged_data = merge_master(merged_dadta)
+print("Done!")
+
+
+
 
 # Read in data from csv to dataframe
-dataframe = pd.read_csv('updated_master.csv',parse_dates=[['Date', 'time']])
+dataframe = pd.read_csv('master.csv',parse_dates=[['Date', 'Time']])
 
-dataframe['Time'] = dataframe['Date_time']
+dataframe['Time'] = dataframe['Date_Time']
 print(dataframe.info())
 print(dataframe.head())
 # Title webpage
@@ -23,34 +55,47 @@ col1, col2, col3, col4, col5 = st.columns(5)    #Establishes number of columns
 #create variable total_pwr_avg to equal the sum of the column titled Total KWh
 
 
-total_pwr_avg = dataframe['Total kWh'].sum()
+total_pwr_avg = dataframe['TOTAL_Kwh'].sum()
 total_pwr_avg = round(total_pwr_avg)
+#calculate how many days of data have been collected based on the number of rows in the dataframe
+days_of_data = dataframe['TOTAL_Kwh'].count()/288
 
-#Avg Kwh per day
-#create a variable for each floor to equal the sum of the column titled Avg kWh 1st, Avg kWh 2nd, etc.
-flr_1_kWh_Avg = dataframe['Avg kWh 1st'].sum()
-flr_1_kWh_Avg = round(flr_1_kWh_Avg)
-flr_2_kWh_Avg = dataframe['Avg kWh 2nd'].sum()
-flr_2_kWh_Avg = round(flr_2_kWh_Avg)
-flr_3_kWh_Avg = dataframe['Avg kWh 3rd'].sum()
-flr_3_kWh_Avg = round(flr_3_kWh_Avg)
-flr_4_kWh_Avg = dataframe['Avg kWh 4th'].sum()
-flr_4_kWh_Avg = round(flr_4_kWh_Avg)
-utilities_kWh_Avg = dataframe['Utilites kWh'].sum()
-utilities_kWh_Avg = round(utilities_kWh_Avg)
-total_kWh_Avg = dataframe['Total kWh'].sum()
-total_kWh_Avg = round(total_kWh_Avg)
+#calculate kWh per day
+#create a variable for each floor to equal the sum of the 1st_Floor_Kwh, 2nd_Floor_Kwh, etc. divided by the number of days of data that have been collected so far
+flr_1_kWh_Day = dataframe['1st_Floor_Kwh'].sum()/days_of_data
+flr_1_kWh_Day = round(flr_1_kWh_Day,2)
+flr_2_kWh_Day = dataframe['2nd_Floor_Kwh'].sum()/days_of_data
+flr_2_kWh_Day = round(flr_2_kWh_Day,2)
+flr_3_kWh_Day = dataframe['3rd_Floor_Kwh'].sum()/days_of_data
+flr_3_kWh_Day = round(flr_3_kWh_Day,2)
+flr_4_kWh_Day = dataframe['4th_Floor_Kwh'].sum()/days_of_data
+flr_4_kWh_Day = round(flr_4_kWh_Day,2)
+utilities_kWh_Day = dataframe['Utilities_Kwh'].sum()/days_of_data
+utilities_kWh_Day = round(utilities_kWh_Day,2)
 
-#Avg kWh per room per day
-#create a variable for each floor to equal the sum of the column titled Avg Rm 1st, Avg Rm 2nd, etc.
-flr_1_kWh_Rm = dataframe['Avg Rm 1st'].sum()
-flr_1_kWh_Rm = round(flr_1_kWh_Rm,2)
-flr_2_kWh_Rm = dataframe['Avg Rm 2nd'].sum()
-flr_2_kWh_Rm = round(flr_2_kWh_Rm,2)
-flr_3_kWh_Rm = dataframe['Avg Rm 3rd'].sum()
-flr_3_kWh_Rm = round(flr_3_kWh_Rm,2)
-flr_4_kWh_Rm = dataframe['Avg Rm 4th'].sum()
-flr_4_kWh_Rm = round(flr_4_kWh_Rm,2)
+
+
+
+
+#calculate kWh per room per day
+#number of rooms on each floor:
+first_rooms = 22
+second_rooms = 49
+third_rooms = 49
+fourth_rooms = 35
+
+#create a variable for each floor to equal the flr1_kWh_Day divided by the number of rooms on that floor
+flr_1_kWh_Room_Day = flr_1_kWh_Day/first_rooms
+flr_1_kWh_Room_Day = round(flr_1_kWh_Room_Day,2)
+flr_2_kWh_Room_Day = flr_2_kWh_Day/second_rooms
+flr_2_kWh_Room_Day = round(flr_2_kWh_Room_Day,2)
+flr_3_kWh_Room_Day = flr_3_kWh_Day/third_rooms
+flr_3_kWh_Room_Day = round(flr_3_kWh_Room_Day,2)
+flr_4_kWh_Room_Day = flr_4_kWh_Day/fourth_rooms
+flr_4_kWh_Room_Day = round(flr_4_kWh_Room_Day,2)
+
+
+
 
 
 # Change between last interval and new
@@ -81,7 +126,7 @@ flr_4_kWh_Rm = round(flr_4_kWh_Rm,2)
 #              '{} kW'.format(flr_4_pwr_avg),
 #              '{}'.format(delta_flr_4_avg), 
 #              delta_color = 'inverse')
- 
+
 
 
 tab1, tab7, tab2, tab3, tab4, tab5, tab6,  =    st.tabs(['Total Energy', 'Compare by Floor', 'Floor 1', 'Floor 2', 'Floor 3', 'Floor 4', 'Utilities'])
@@ -94,41 +139,41 @@ with tab1:
 with tab7:
     st.header('Usage by Floor Comparison')
     col1,col2,col3,col4 = st.columns(4)
-    col1.metric('1st Floor Daily Average','{} kWh'.format(flr_1_kWh_Avg))
-    col2.metric('2nd Floor Daily Average','{} kWh'.format(flr_2_kWh_Avg))
-    col3.metric('3rd Floor Daily Average','{} kWh'.format(flr_3_kWh_Avg))
-    col4.metric('4th Floor Daily Average','{} kWh'.format(flr_4_kWh_Avg))
+    col1.metric('1st Floor Daily Average','{} kWh'.format(flr_1_kWh_Day))
+    col2.metric('2nd Floor Daily Average','{} kWh'.format(flr_2_kWh_Day))
+    col3.metric('3rd Floor Daily Average','{} kWh'.format(flr_3_kWh_Day))
+    col4.metric('4th Floor Daily Average','{} kWh'.format(flr_4_kWh_Day))
     with st.expander('See more stats'):
         st.subheader('Average Daily kWh Consumption Per Room')
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric('1st Floor','{} kWh'.format(flr_1_kWh_Rm))
-        col2.metric('2nd Floor','{} kWh'.format(flr_2_kWh_Rm))
-        col3.metric('3rd Floor','{} kWh'.format(flr_3_kWh_Rm))
-        col4.metric('4th Floor','{} kWh'.format(flr_4_kWh_Rm))
-    st.line_chart(dataframe,x = 'Time', y = ('1st Floor', '2nd floor','3rd floor','4th floor'))
+        col1.metric('1st Floor','{} kWh'.format(flr_1_kWh_Room_Day))
+        col2.metric('2nd Floor','{} kWh'.format(flr_2_kWh_Room_Day))
+        col3.metric('3rd Floor','{} kWh'.format(flr_3_kWh_Room_Day))
+        col4.metric('4th Floor','{} kWh'.format(flr_4_kWh_Room_Day))
+    st.line_chart(dataframe,x = 'Time', y = ('1st_Floor', '2nd_Floor','3rd_Floor','4th_Floor'))
 
 
 with tab2:
     st.header('1st Floor')
-    st.subheader('The 1st floor consumes :blue['+str(flr_1_kWh_Avg)+' kWh] per day on average! That is equivalent to :blue['+str(flr_1_kWh_Rm)+' kWh] per room per day!')
-    st.line_chart(dataframe, x = 'Time', y = ('1st Floor'))
+    st.subheader('The 1st floor consumes :blue['+str(flr_1_kWh_Day)+' kWh] per day on average! That is equivalent to :blue['+str(flr_1_kWh_Room_Day)+' kWh] per room per day!')
+    st.line_chart(dataframe, x = 'Time', y = ('1st_Floor'))
 
 with tab3:
     st.header('2nd Floor')
-    st.subheader('The 2nd floor consumes :blue['+str(flr_2_kWh_Avg)+' kWh] per day on average! That is equivalent to :blue['+str(flr_2_kWh_Rm)+' kWh] per room per day!')
-    st.line_chart(dataframe, x = 'Time', y = ('2nd floor'))
+    st.subheader('The 2nd floor consumes :blue['+str(flr_2_kWh_Day)+' kWh] per day on average! That is equivalent to :blue['+str(flr_2_kWh_Room_Day)+' kWh] per room per day!')
+    st.line_chart(dataframe, x = 'Time', y = ('2nd_Floor'))
 
 with tab4:
     st.header('3rd Floor')
-    st.subheader('The 3rd floor consumes :blue['+str(flr_3_kWh_Avg)+' kWh] per day on average! That is equivalent to :blue['+str(flr_3_kWh_Rm)+' kWh] per room per day!')
-    st.line_chart(dataframe, x = 'Time', y = ('3rd floor'))
+    st.subheader('The 3rd floor consumes :blue['+str(flr_3_kWh_Day)+' kWh] per day on average! That is equivalent to :blue['+str(flr_3_kWh_Room_Day)+' kWh] per room per day!')
+    st.line_chart(dataframe, x = 'Time', y = ('3rd_Floor'))
 
 with tab5:
     st.header('4th Floor')
-    st.subheader('The 4th floor consumes :blue['+str(flr_4_kWh_Avg)+' kWh] per day on average! That is equivalent to :blue['+str(flr_4_kWh_Rm)+' kWh] per room per day!')
-    st.line_chart(dataframe, x = 'Time', y = ('4th floor'))
+    st.subheader('The 4th floor consumes :blue['+str(flr_4_kWh_Day)+' kWh] per day on average! That is equivalent to :blue['+str(flr_4_kWh_Room_Day)+' kWh] per room per day!')
+    st.line_chart(dataframe, x = 'Time', y = ('4th_Floor'))
 
 with tab6:
     st.header('Utilities')
-    st.subheader('The utilities consume :blue['+str(utilities_kWh_Avg)+' kWh] per day on average!')
+    st.subheader('The utilities consume :blue['+str(utilities_kWh_Day)+' kWh] per day on average!')
     st.line_chart(dataframe, x = 'Time', y = ('Utilities'))
