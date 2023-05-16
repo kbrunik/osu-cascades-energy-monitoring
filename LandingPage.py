@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from Raw_Data import *
+# from Raw_Data import *
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 
@@ -19,17 +19,17 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
 
 SERVER_IDS = [1, 2, 3]
-print("starting data collection...")
+# print("starting data collection...")
 # pullData("IP Address","Username","Password","ID")
-pullData("IP Address","Username","Password","1")
-daily_data_trim(1)
-pullData("IP Address","Username","Password","2")
-daily_data_trim(2)
-pullData("IP Address","Username","Password","3")
-daily_data_trim(3)
-merged_dadta = pull_5_min_data(SERVER_IDS)
-merged_data = merge_master(merged_dadta)
-print("Done!")
+# pullData("IP Address","Username","Password","1")
+# daily_data_trim(1)
+# pullData("IP Address","Username","Password","2")
+# daily_data_trim(2)
+# pullData("IP Address","Username","Password","3")
+# daily_data_trim(3)
+# merged_dadta = pull_5_min_data(SERVER_IDS)
+# merged_data = merge_master(merged_dadta)
+# print("Done!")
 
 
 

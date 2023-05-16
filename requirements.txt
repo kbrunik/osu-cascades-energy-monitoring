@@ -1,0 +1,6 @@
+streamlit
+streamlit_autorefresh
+pandas
+numpy
+pysftp
+datetime
