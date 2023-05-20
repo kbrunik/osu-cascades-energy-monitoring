@@ -18,21 +18,6 @@ st.markdown(hide_menu_style, unsafe_allow_html=True)
 #refreshes page every 5 minutes
 st_autorefresh(interval=5 * 60 * 1000, key="dataframerefresh")
 
-SERVER_IDS = [1, 2, 3]
-# print("starting data collection...")
-# pullData("IP Address","Username","Password","ID")
-# pullData("IP Address","Username","Password","1")
-# daily_data_trim(1)
-# pullData("IP Address","Username","Password","2")
-# daily_data_trim(2)
-# pullData("IP Address","Username","Password","3")
-# daily_data_trim(3)
-# merged_dadta = pull_5_min_data(SERVER_IDS)
-# merged_data = merge_master(merged_dadta)
-# print("Done!")
-
-
-
 
 # Read in data from csv to dataframe
 dataframe = pd.read_csv('master.csv',parse_dates=[['Date', 'Time']])
@@ -50,11 +35,7 @@ st.markdown("<h2 style='text-align: center;'>Current Electrical Usage</h2>", uns
 # Columns with current energy trends
 col1, col2, col3, col4, col5 = st.columns(5)    #Establishes number of columns
 
-# Total power consumption averages 
-# TODO: Update averages with dynamic updates from dynamic csv
-#create variable total_pwr_avg to equal the sum of the column titled Total KWh
-
-
+#calculate average power usage for each floor
 total_pwr_avg = dataframe['TOTAL_Kwh'].sum()
 total_pwr_avg = round(total_pwr_avg)
 #calculate how many days of data have been collected based on the number of rows in the dataframe
